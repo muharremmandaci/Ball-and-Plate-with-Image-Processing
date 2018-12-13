@@ -1,0 +1,19 @@
+﻿<Window x:Class="WpfApp3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp3"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="892">
+    <Grid x:Name="grid" Margin="0,0,20,0">
+        <Image Name="IS" Margin="10,10,0,0" Width="640" Height="480" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Label x:Name="lbl_x" Content="Label" HorizontalAlignment="Left" Margin="67,524,0,0" VerticalAlignment="Top" Height="35" Width="70" FontSize="20"/>
+        <ComboBox x:Name="cb_port" HorizontalAlignment="Left" Margin="690,98,0,0" VerticalAlignment="Top" Width="154" Height="36"/>
+        <ComboBox x:Name="cb_baudrate" HorizontalAlignment="Left" Margin="690,167,0,0" VerticalAlignment="Top" Width="154" Height="36"/>
+        <Button x:Name="btn_search" Content="SEARCH" HorizontalAlignment="Left" Margin="690,17,0,0" VerticalAlignment="Top" Width="154" Height="47" Click="btn_search_Click"/>
+        <Button x:Name="btn_start" Content="START" HorizontalAlignment="Left" Margin="690,228,0,0" VerticalAlignment="Top" Width="154" Height="46" Click="btn_start_Click"/>
+        <Button x:Name="btn_stop" Content="STOP" HorizontalAlignment="Left" Margin="690,299,0,0" VerticalAlignment="Top" Width="154" Height="44" Click="btn_stop_Click"/>
+        <Label x:Name="lbl_y" Content="Label" HorizontalAlignment="Left" Margin="142,524,0,0" VerticalAlignment="Top" Width="62" FontSize="20" RenderTransformOrigin="0.71,0.423"/>
+    </Grid>
+</Window>
