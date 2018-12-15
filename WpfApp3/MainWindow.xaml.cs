@@ -6,6 +6,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -74,7 +75,7 @@ namespace WpfApp3
         {
             if (_capture != null && _capture.Ptr != IntPtr.Zero)
             {
-                _capture.Retrieve(_frame, 0);
+                _capture.Retrieve(_frame, 1);
 
                 this.Dispatcher.Invoke((Action)(() =>
                 {
@@ -94,13 +95,15 @@ namespace WpfApp3
 
         private void run_control_algorithm()
         {
-            angles = calculate_angles();
+            //angles = calculate_angles();
             send_angels_to_arduino(angles);
         }
 
         private void send_angels_to_arduino(float[] angles)
         {
-            _serialPort.WriteLine(angles[0] + "," + angles[0]);
+            _serialPort.WriteLine(angles[0].ToString());
+            Thread.Sleep(1);
+            _serialPort.WriteLine(angles[1].ToString());
         }
 
         private float[] calculate_angles()
@@ -121,8 +124,8 @@ namespace WpfApp3
 
         private Mat find_ball()
         {
-            MCvScalar orangeMin = new MCvScalar(10, 120, 100);//0 70 50
-            MCvScalar orangeMax = new MCvScalar(70, 255, 255);//15 255 255
+            MCvScalar orangeMin = new MCvScalar(0,0,212);//10 120 100
+            MCvScalar orangeMax = new MCvScalar(131, 255,255);//70 255 255
 
             Mat arr = new Mat();
 
@@ -138,8 +141,8 @@ namespace WpfApp3
             param.FilterByConvexity = false;
             param.FilterByInertia = false;
             param.FilterByColor = false;
-            param.MinArea = 3000;
-            param.MaxArea = 50000;
+            param.MinArea = 1000;
+            param.MaxArea = 3000;
             SimpleBlobDetector detector = new SimpleBlobDetector(param);
             MKeyPoint[] keypoints = detector.Detect(hsvImg);
             Features2DToolbox.DrawKeypoints(img, new VectorOfKeyPoint(keypoints), img, new
@@ -151,50 +154,88 @@ namespace WpfApp3
                 centerY = (int)item.Point.Y;
             }
 
-            lbl_x.Content = centerX;
-            lbl_y.Content = centerY;
+            lbl_x.Content = "Center X: " + centerX;
+            lbl_y.Content = "Center Y: " + centerY;
 
-            arr = img;
-            return arr;
+            return img;
         }
 
         private void btn_search_Click(object sender, RoutedEventArgs e)
         {
             foreach (string s in SerialPort.GetPortNames())
             {
-                cb_port.Items.Add(s);
+                if (!cb_port.Items.Contains(s))
+                {
+                    cb_port.Items.Add(s);
+                }
+                
             }
-
-            cb_baudrate.Items.Add("9600");
-            cb_baudrate.Items.Add("19200");
-            cb_baudrate.Items.Add("57600");
-            cb_baudrate.Items.Add("115200");
         }
 
         private void btn_stop_Click(object sender, RoutedEventArgs e)
         {
             is_started = false;
 
-            _serialPort.Close() ;
+            _serialPort.Close();
+            btn_start.IsEnabled = true;
+            btn_stop.IsEnabled = false;
         }
 
         private void btn_start_Click(object sender, RoutedEventArgs e)
         {
             if (cb_baudrate.SelectedItem != null && cb_port.SelectedItem != null)
             {
-                _serialPort.PortName = cb_baudrate.SelectedItem.ToString();
-                _serialPort.BaudRate = Convert.ToInt32(cb_port.SelectedItem);
+                _serialPort.PortName = cb_port.SelectedItem.ToString();
+                _serialPort.BaudRate = Convert.ToInt32(cb_baudrate.SelectedItem);
 
                 _serialPort.Open();
 
                 is_started = true;
+                btn_start.IsEnabled=false;
+                btn_stop.IsEnabled = true;
             }
             else
             {
                 MessageBox.Show("null error");
             }
-            
-            
+
+        }
+
+        private void IS_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            System.Windows.Point position = e.GetPosition(this) ;
+            MessageBox.Show(position.X + " " + position.Y);
+        }
+
+        private void Window_Initialized(object sender, EventArgs e)
+        {
+            foreach (string s in SerialPort.GetPortNames())
+            {
+                cb_port.Items.Add(s);
+                cb_port.SelectedItem = cb_port.Items.GetItemAt(0);
+            }
+
+            cb_baudrate.Items.Add("9600");
+            cb_baudrate.Items.Add("19200");
+            cb_baudrate.Items.Add("57600");
+            cb_baudrate.Items.Add("115200");
+
+            cb_baudrate.SelectedItem = cb_baudrate.Items.GetItemAt(0);
+
+            angles[0] = 45;
+            angles[1] = 25;
+
+            txt_value.Text ="45";
+            txt_value2.Text = "25";
+
+            btn_start.IsEnabled = true;
+            btn_stop.IsEnabled = false;
+        }
+
+        private void btn_change_angle_Click(object sender, RoutedEventArgs e)
+        {
+            angles[0] = Convert.ToInt32(txt_value.Text);
+            angles[1] = Convert.ToInt32(txt_value2.Text);
         }
     }
 }
