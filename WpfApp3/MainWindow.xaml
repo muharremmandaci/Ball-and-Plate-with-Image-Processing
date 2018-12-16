@@ -5,18 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp3"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="892" Initialized="Window_Initialized">
+        Title="MainWindow" Height="600" Width="1260" Initialized="Window_Initialized">
     <Grid x:Name="grid" Margin="0,0,20,0">
         <Image Name="IS" Margin="10,10,0,0" Width="640" Height="480" HorizontalAlignment="Left" VerticalAlignment="Top" PreviewMouseLeftButtonDown="IS_PreviewMouseLeftButtonDown"/>
-        <Label x:Name="lbl_x" Content="Label" HorizontalAlignment="Left" Margin="67,524,0,0" VerticalAlignment="Top" Height="35" Width="121" FontSize="20"/>
+        <Label x:Name="lbl_x" Content="Label" HorizontalAlignment="Left" Margin="67,524,0,0" VerticalAlignment="Top" Height="35" Width="189" FontSize="20"/>
         <ComboBox x:Name="cb_port" HorizontalAlignment="Left" Margin="690,98,0,0" VerticalAlignment="Top" Width="154" Height="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <ComboBox x:Name="cb_baudrate" HorizontalAlignment="Left" Margin="690,167,0,0" VerticalAlignment="Top" Width="154" Height="36" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Button x:Name="btn_search" Content="SEARCH" HorizontalAlignment="Left" Margin="690,17,0,0" VerticalAlignment="Top" Width="154" Height="47" Click="btn_search_Click"/>
         <Button x:Name="btn_start" Content="START" HorizontalAlignment="Left" Margin="690,228,0,0" VerticalAlignment="Top" Width="154" Height="46" Click="btn_start_Click"/>
         <Button x:Name="btn_stop" Content="STOP" HorizontalAlignment="Left" Margin="690,299,0,0" VerticalAlignment="Top" Width="154" Height="44" Click="btn_stop_Click"/>
-        <Label x:Name="lbl_y" Content="Label" HorizontalAlignment="Left" Margin="210,524,0,0" VerticalAlignment="Top" Width="120" FontSize="20" RenderTransformOrigin="0.71,0.423" Height="35"/>
+        <Label x:Name="lbl_y" Content="Label" HorizontalAlignment="Left" Margin="366,524,0,0" VerticalAlignment="Top" Width="228" FontSize="20" RenderTransformOrigin="0.71,0.423" Height="35"/>
         <TextBox x:Name="txt_value" HorizontalAlignment="Left" Height="23" Margin="706,378,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <TextBox x:Name="txt_value2" HorizontalAlignment="Left" Height="23" Margin="706,406,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
         <Button x:Name="btn_change_angle" Content="Button" HorizontalAlignment="Left" Margin="732,459,0,0" VerticalAlignment="Top" Width="75" Click="btn_change_angle_Click"/>
+        <TextBox x:Name="txt_error_x" HorizontalAlignment="Left" Height="23" Margin="980,125,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="txt_error_y" HorizontalAlignment="Left" Height="23" Margin="980,153,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <Label Content="error x:" HorizontalAlignment="Left" Margin="918,125,0,0" VerticalAlignment="Top"/>
+        <Label Content="error y:" HorizontalAlignment="Left" Margin="918,153,0,0" VerticalAlignment="Top"/>
+        <Label Content="angle 2:" HorizontalAlignment="Left" Margin="940,228,0,0" VerticalAlignment="Top"/>
+        <Label Content="angle2:" HorizontalAlignment="Left" Margin="940,274,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="txt_angle1" HorizontalAlignment="Left" Height="23" Margin="1010,228,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="txt_angle2" HorizontalAlignment="Left" Height="23" Margin="1010,277,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </Window>
