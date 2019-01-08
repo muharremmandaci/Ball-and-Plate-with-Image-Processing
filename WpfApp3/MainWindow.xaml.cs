@@ -45,16 +45,19 @@ namespace WpfApp3
         bool is_started = false;
 
         float total_error_x = 0;
-        float[] error_x= {0 ,0};
+        float[] error_x = { 0, 0 };
 
         float total_error_y = 0;
         float[] error_y = { 0, 0 };
 
-        int dX = 325, dY = 245;
+        float def_angle1 = 50;
+        float def_angle2 = 25;
 
-        double Kp = -1.05;   //0.996
+        int dX = 358, dY = 264;
+
+        double Kp = -1.05;   //
         double Kd = -0.373;  //0.373
-        double Ki = -0.700;  //0.8302
+        double Ki = -0.8302;  //0.8302
 
         double cam_ratio = 0.0573;
 
@@ -63,6 +66,11 @@ namespace WpfApp3
         int max_angle = 10;
 
         float[] result = { 0, 0 };
+
+        int x_max = 800;
+        int x_min = 0;
+        int y_max = 800;
+        int y_min = 0;
 
         static SerialPort _serialPort;
 
@@ -86,9 +94,19 @@ namespace WpfApp3
             }
 
             _frame = new Mat();
- 
+
             InitializeComponent();
             DataContext = this;
+
+            txt_kp.Text = Kp.ToString();
+            txt_kd.Text = Kd.ToString();
+            txt_ki.Text = Ki.ToString();
+
+            txt_ref_x.Text = dX.ToString();
+            txt_ref_y.Text = dY.ToString();
+
+            txt_def_angle1.Text = def_angle1.ToString();
+            txt_def_angle2.Text = def_angle2.ToString();
         }
 
         private void ProcessFrame(object sender, EventArgs arg)
@@ -117,16 +135,16 @@ namespace WpfApp3
         {
             float[] d_angles = calculate_angles();
 
-            angles[0] = Convert.ToByte((52 - d_angles[1])*3);
-            angles[1] = Convert.ToByte((25 - d_angles[0])*3);
+            angles[0] = Convert.ToByte((def_angle1 - d_angles[1]) * 3);
+            angles[1] = Convert.ToByte((def_angle2 - d_angles[0]) * 3);
 
             send_angels_to_arduino(angles);
         }
 
         private void send_angels_to_arduino(byte[] angles)
         {
-            txt_value.Text = (angles[0]/3).ToString();
-            txt_value2.Text = (angles[1]/3).ToString();
+            //txt_value.Text = (angles[0]/3).ToString();
+            //txt_value2.Text = (angles[1]/3).ToString();
 
             _serialPort.WriteLine(angles[0].ToString());
             Thread.Sleep(1);
@@ -136,17 +154,17 @@ namespace WpfApp3
         private float[] calculate_angles()
         {
             error_x[0] = error_x[1];
-            error_x[1] = (float)((dX-centerX)*cam_ratio);
+            error_x[1] = (float)((dX - centerX) * cam_ratio);
 
             error_y[0] = error_y[1];
             error_y[1] = (float)((dY - centerY) * cam_ratio);
 
-            if (error_x[1] < 0.25 && error_x[1] > -0.25)
+            if (error_x[1] < 0.4 && error_x[1] > -0.4)
             {
                 error_x[1] = 0;
             }
 
-            if (error_y[1] < 0.25 && error_y[1] > -0.25)
+            if (error_y[1] < 0.4 && error_y[1] > -0.4)
             {
                 error_y[1] = 0;
             }
@@ -154,16 +172,17 @@ namespace WpfApp3
             total_error_x += error_x[1];
             total_error_y += error_y[1];
 
-            result[0] =(float)(Kp* error_x[1]+Ki*Ts*total_error_x+Kd*((error_x[1]-error_x[0])/Ts));
+            result[0] = (float)(Kp * error_x[1] + Ki * Ts * total_error_x + Kd * ((error_x[1] - error_x[0]) / Ts));
 
-            
+
 
             result[1] = (float)(Kp * error_y[1] + Ki * Ts * total_error_y + Kd * ((error_y[1] - error_y[0]) / Ts));
 
             txt_error_x.Text = error_x[1].ToString();
             txt_error_y.Text = error_y[1].ToString();
 
-            if (result[0] > max_angle) {
+            if (result[0] > max_angle)
+            {
                 result[0] = max_angle;
             }
             else if (result[0] < -max_angle)
@@ -195,8 +214,8 @@ namespace WpfApp3
 
         private Mat find_ball()
         {
-            MCvScalar orangeMin = new MCvScalar(0,0,212);//10 120 100
-            MCvScalar orangeMax = new MCvScalar(131, 255,255);//70 255 255
+            MCvScalar orangeMin = new MCvScalar(0, 0, 212);//10 120 100
+            MCvScalar orangeMax = new MCvScalar(131, 255, 255);//70 255 255
 
             Mat arr = new Mat();
 
@@ -221,11 +240,30 @@ namespace WpfApp3
 
             foreach (var item in keypoints)
             {
-                if((int)item.Point.X>110 && (int)item.Point.X<540 && (int)item.Point.Y>30 && (int)item.Point.Y < 460)
+                if ((int)item.Point.X > x_min && (int)item.Point.X < x_max && (int)item.Point.Y > y_min && (int)item.Point.Y < y_max)
                 {
                     centerX = (int)item.Point.X;
                     centerY = (int)item.Point.Y;
                 }
+                else
+                {
+                    centerX = dX;
+                    centerY = dY;
+
+                    total_error_x = 0;
+
+                    total_error_y = 0;
+                }
+
+            }
+            if (keypoints.Length == 0)
+            {
+                centerX = dX;
+                centerY = dY;
+
+                total_error_x = 0;
+            
+                total_error_y = 0;
             }
 
             lbl_x.Content = "Center X: " + centerX;
@@ -242,19 +280,19 @@ namespace WpfApp3
                 {
                     cb_port.Items.Add(s);
                 }
-                
+
             }
         }
 
         private void btn_stop_Click(object sender, RoutedEventArgs e)
         {
             is_started = false;
-            
-            byte[] zero ={52*3, 25*3};
+
+            byte[] zero = { (byte)(def_angle1 * 3), (byte)(def_angle2 * 3) };
             send_angels_to_arduino(zero);
 
             total_error_x = 0;
-            error_x[0] = 0 ;
+            error_x[0] = 0;
             error_x[1] = 0;
 
             total_error_y = 0;
@@ -270,13 +308,16 @@ namespace WpfApp3
         {
             if (cb_baudrate.SelectedItem != null && cb_port.SelectedItem != null)
             {
-                _serialPort.PortName = cb_port.SelectedItem.ToString();
-                _serialPort.BaudRate = Convert.ToInt32(cb_baudrate.SelectedItem);
+                if (!_serialPort.IsOpen)
+                {
+                    _serialPort.PortName = cb_port.SelectedItem.ToString();
+                    _serialPort.BaudRate = Convert.ToInt32(cb_baudrate.SelectedItem);
 
-                _serialPort.Open();
+                    _serialPort.Open();
+                }
 
                 is_started = true;
-                btn_start.IsEnabled=false;
+                btn_start.IsEnabled = false;
                 btn_stop.IsEnabled = true;
             }
             else
@@ -288,8 +329,8 @@ namespace WpfApp3
 
         private void IS_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            System.Windows.Point position = e.GetPosition(this) ;
-            MessageBox.Show(position.X + " " + position.Y);
+            System.Windows.Point position = e.GetPosition(this);
+            MessageBox.Show("X: " + position.X + " Y: " + position.Y);
         }
 
         private void Window_Initialized(object sender, EventArgs e)
@@ -307,20 +348,38 @@ namespace WpfApp3
 
             cb_baudrate.SelectedItem = cb_baudrate.Items.GetItemAt(0);
 
-            /*angles[0] = 45;
-            angles[1] = 25;*/
-
-            txt_value.Text ="45";
-            txt_value2.Text = "25";
-
             btn_start.IsEnabled = true;
             btn_stop.IsEnabled = false;
         }
 
-        private void btn_change_angle_Click(object sender, RoutedEventArgs e)
+        private void btn_update_servo_Click(object sender, RoutedEventArgs e)
         {
-            angles[0] = Convert.ToByte(txt_value.Text);
-            angles[1] = Convert.ToByte(txt_value2.Text);
+            if (!_serialPort.IsOpen)
+            {
+                _serialPort.PortName = cb_port.SelectedItem.ToString();
+                _serialPort.BaudRate = Convert.ToInt32(cb_baudrate.SelectedItem);
+
+                _serialPort.Open();
+            }
+
+            def_angle1 = Convert.ToInt32(txt_def_angle1.Text);
+            def_angle2 = Convert.ToInt32(txt_def_angle2.Text);
+
+            byte[] angles = { (byte)(def_angle1 * 3), (byte)(def_angle2 * 3) };
+            send_angels_to_arduino(angles);
+        }
+
+        private void btn_update_refs_Click(object sender, RoutedEventArgs e)
+        {
+            dX = Convert.ToInt32(txt_ref_x.Text);
+            dY = Convert.ToInt32(txt_ref_y.Text);
+        }
+
+        private void btn_update_Click(object sender, RoutedEventArgs e)
+        {
+            Kp = Convert.ToDouble(txt_kp.Text);
+            Kd = Convert.ToDouble(txt_kd.Text);
+            Ki = Convert.ToDouble(txt_ki.Text);  
         }
     }
 }
